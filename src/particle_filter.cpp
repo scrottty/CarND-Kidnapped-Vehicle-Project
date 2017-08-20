@@ -19,6 +19,9 @@
 
 using namespace std;
 
+// random number generator
+static default_random_engine gen;
+
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// TODO: Set the number of particles. Initialize all particles to first position (based on estimates of 
 	//   x, y, theta and their uncertainties from GPS) and all weights to 1. 
@@ -38,7 +41,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   num_particles = 10;
   
   // Create a random number generator
-  default_random_engine gen;
+//  default_random_engine gen;
   
   // Create num of particles with their positions initiliased around the GPS location
   for (int i=0; i<num_particles; i++)
@@ -69,7 +72,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 //  yaw_rate = M_PI/8;
   
   // Random number generator
-  default_random_engine gen;
+//  default_random_engine gen;
   
   for (int i=0; i<particles.size(); i++)
   {
@@ -78,7 +81,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
     // Calc the change in position
     double x_change, y_change, theta_change;
     
-    if (yaw_rate != 0)
+    if (fabs(yaw_rate) > 0.0001)
     {
       x_change = velocity/yaw_rate * (sin(p.theta + yaw_rate*delta_t)-sin(p.theta));
       y_change = velocity/yaw_rate * (cos(p.theta)-cos(p.theta + yaw_rate*delta_t));
@@ -86,8 +89,8 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
     }
     else
     {
-      x_change = velocity * cos(p.theta);
-      y_change = velocity * sin(p.theta);
+      x_change = velocity * cos(p.theta)*delta_t;
+      y_change = velocity * sin(p.theta)*delta_t;
       theta_change = 0;
     }
     
@@ -221,7 +224,7 @@ void ParticleFilter::resample() {
   
   // distribution with to select from and random generator
   std::discrete_distribution<double> dist (weights.begin(), weights.end());
-  std::default_random_engine gen;
+//  std::default_random_engine gen;
   
   // Select new particles
   // Add particle to vector selected from weights in dist
